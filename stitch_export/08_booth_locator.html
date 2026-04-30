@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Booth Locator - MataData</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;900&amp;family=Plus+Jakarta+Sans:wght@400;500;700&amp;family=Space+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "pure-white": "#FFFFFF",
+                        "surface-container-high": "#e8e8e4",
+                        "source-prs": "#185FA5",
+                        "tertiary-fixed": "#c4e7ff",
+                        "text-secondary": "#5C5C5C",
+                        "on-error": "#ffffff",
+                        "surface": "#fafaf5",
+                        "on-surface-variant": "#524534",
+                        "amber-soft": "#FFF3D6",
+                        "inverse-on-surface": "#f1f1ec",
+                        "text-muted": "#9E9E9E",
+                        "primary-fixed": "#ffddb4",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#e5e2e1",
+                        "tertiary": "#00658a",
+                        "secondary": "#5f5e5e",
+                        "primary": "#835500",
+                        "on-tertiary-fixed-variant": "#004c69",
+                        "tertiary-container": "#3ac2ff",
+                        "on-primary-container": "#644000",
+                        "surface-dim": "#dadad6",
+                        "on-primary-fixed-variant": "#633f00",
+                        "error-container": "#ffdad6",
+                        "amber-dark": "#D4891A",
+                        "success-green": "#2D9F5C",
+                        "deep-cream": "#F0EBE0",
+                        "election-amber": "#F5A623",
+                        "source-myneta": "#8B1A1A",
+                        "outline": "#857462",
+                        "on-surface": "#1a1c19",
+                        "on-secondary-fixed-variant": "#474646",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eeeee9",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "warm-cream": "#FAFAF5",
+                        "background": "#fafaf5",
+                        "on-tertiary-container": "#004d6a",
+                        "surface-container-highest": "#e2e3de",
+                        "primary-ink": "#0A0A0A",
+                        "inverse-surface": "#2f312e",
+                        "source-eci": "#1A6B3C",
+                        "surface-variant": "#e2e3de",
+                        "alert-red": "#D94F4F",
+                        "primary-fixed-dim": "#ffb955",
+                        "secondary-fixed-dim": "#c9c6c5",
+                        "inverse-primary": "#ffb955",
+                        "primary-container": "#f5a623",
+                        "surface-tint": "#835500",
+                        "outline-variant": "#d7c3ae",
+                        "on-primary-fixed": "#291800",
+                        "on-background": "#1a1c19",
+                        "tertiary-fixed-dim": "#7cd0ff",
+                        "secondary-container": "#e5e2e1",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#001e2c",
+                        "surface-container-low": "#f4f4ef",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fafaf5",
+                        "on-secondary-container": "#656464"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "24px",
+                        "3xl": "48px",
+                        "2xl": "32px",
+                        "xs": "4px",
+                        "md": "12px",
+                        "sm": "8px",
+                        "lg": "16px",
+                        "4xl": "64px"
+                    },
+                    "fontFamily": {
+                        "display-md": ["Epilogue"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "mono-sm": ["Space Grotesk"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "display-xl": ["Epilogue"],
+                        "body-xs": ["Plus Jakarta Sans"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "display-lg": ["Epilogue"],
+                        "body-xl": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "display-md": ["28px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-md": ["15px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "mono-sm": ["12px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "body-lg": ["17px", { "lineHeight": "1.65", "fontWeight": "400" }],
+                        "display-xl": ["52px", { "lineHeight": "1.05", "fontWeight": "700" }],
+                        "body-xs": ["11px", { "lineHeight": "1.5", "fontWeight": "500" }],
+                        "body-sm": ["13px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["36px", { "lineHeight": "1.1", "fontWeight": "700" }],
+                        "body-xl": ["20px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-warm-cream font-body-md text-on-surface h-screen w-screen overflow-hidden flex flex-col relative md:max-w-md md:mx-auto md:border-x md:border-surface-variant md:shadow-2xl">
+<!-- TopAppBar -->
+<header class="bg-[#FFFDF5] dark:bg-stone-950 font-epilogue font-bold tracking-tight text-lg flex justify-between items-center w-full px-6 py-4 absolute top-0 z-10 md:static border-b border-[#F2EFE7] dark:border-stone-800">
+<button aria-label="Menu" class="text-[#1A1A1A] dark:text-stone-100 active:scale-95 transition-transform hover:bg-[#F2EFE7] dark:hover:bg-stone-800 rounded-full p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-xl font-black text-[#1A1A1A] dark:text-stone-100">Booth Locator</h1>
+<button aria-label="Search" class="text-[#1A1A1A] dark:text-stone-100 active:scale-95 transition-transform hover:bg-[#F2EFE7] dark:hover:bg-stone-800 rounded-full p-2">
+<span class="material-symbols-outlined">search</span>
+</button>
+</header>
+<!-- Map Canvas -->
+<main class="flex-grow relative w-full h-full">
+<!-- Map Background -->
+<div class="absolute inset-0 bg-deep-cream z-0" data-alt="A highly detailed overhead view of a light-themed digital map interface. The map shows urban streets and parks in a minimalist style, rendered with subtle warm cream and deep cream tones, aligning with an editorial civic aesthetic. The lighting is soft and even, creating a clear, readable surface for navigation elements without heavy shadows. The overall mood is utilitarian yet premium." data-location="New Delhi" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA6VvomcAUftsYniwCul303IYs42Y0VDDy5-2KAf9oeURBNrw8hUPV_iX08up9NZQfqZqcQlSR25PqnBqTuzxOweZRPhnlIX-42yI7ewJ2cppqq7_Ntl4n-2Hgx_Ie0Q1sdIdq7ubQh-0RT9FlNonfp273OgmQhLG-VR_NhrilHatet8-suW8FqVY5B3CNkH_6c5fJfjX0DWYzGXFEbgDEz89QeKN1cRxJ2iVX7C8g7tDg4ho7E98OX6OCsV17eSdbU-j4ieB21WqM0'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-warm-cream/40 backdrop-blur-[2px]"></div>
+</div>
+<!-- Floating Target Button -->
+<button aria-label="Center Map" class="absolute top-24 right-4 z-20 bg-pure-white p-3 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary-ink" style="font-variation-settings: 'FILL' 1;">my_location</span>
+</button>
+<!-- Map Pins -->
+<!-- User Location Pin -->
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+<div class="w-12 h-12 bg-primary-ink/10 rounded-full animate-pulse absolute -top-3 -left-3"></div>
+<div class="w-6 h-6 bg-source-prs border-2 border-pure-white rounded-full shadow-md relative z-10"></div>
+</div>
+<!-- Polling Booth Pins -->
+<div class="absolute top-1/3 left-1/4 transform -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-election-amber text-[32px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="absolute top-2/3 right-1/4 transform -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-outline text-[28px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="absolute bottom-1/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-outline text-[28px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<!-- Bottom Sheet Card -->
+<div class="absolute bottom-20 left-0 right-0 z-30 px-xl pb-md">
+<div class="bg-pure-white rounded-t-3xl rounded-b-xl shadow-[0_-8px_24px_rgba(0,0,0,0.08)] p-xl border border-surface-variant flex flex-col gap-lg">
+<!-- Sheet Handle -->
+<div class="w-12 h-1.5 bg-surface-variant rounded-full mx-auto -mt-sm mb-sm"></div>
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-xs">
+<span class="font-mono-sm text-mono-sm text-election-amber uppercase tracking-wider">Nearest Booth</span>
+<h2 class="font-display-md text-display-md text-primary-ink">Primary School, Room 1</h2>
+<p class="font-body-md text-body-md text-text-secondary">Block C, Sector 14, Urban Estate</p>
+</div>
+<div class="bg-amber-soft px-sm py-xs rounded-lg flex flex-col items-center justify-center border border-election-amber/20">
+<span class="font-display-md text-body-xl text-primary-ink">1.2</span>
+<span class="font-mono-sm text-body-xs text-primary-ink">km</span>
+</div>
+</div>
+<div class="flex items-center gap-sm bg-surface-container-low p-md rounded-xl">
+<span class="material-symbols-outlined text-success-green">schedule</span>
+<span class="font-body-sm text-body-sm text-primary-ink font-medium">Low wait time</span>
+<span class="font-body-sm text-body-sm text-text-secondary ml-auto">~5 mins</span>
+</div>
+<button class="w-full bg-election-amber text-pure-white font-body-lg text-body-lg font-bold py-lg rounded-full shadow-[0_4px_12px_rgba(245,166,35,0.2)] active:scale-[0.98] transition-transform flex items-center justify-center gap-sm mt-xs">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions</span>
+                    Get Directions
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-md fixed bottom-0 w-full z-50 h-16 border-t border-stone-200/50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 md:hidden font-epilogue text-[10px] font-bold uppercase tracking-widest">
+<button class="flex flex-col items-center justify-center text-[#1A1A1A] dark:text-stone-400 opacity-60 hover:opacity-100 transition-opacity gap-1 w-16">
+<span class="material-symbols-outlined text-[24px]">menu_book</span>
+<span>Guide</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#1A1A1A] dark:text-stone-400 opacity-60 hover:opacity-100 transition-opacity gap-1 w-16">
+<span class="material-symbols-outlined text-[24px]">groups</span>
+<span>Candidates</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#1A1A1A] dark:text-stone-400 opacity-60 hover:opacity-100 transition-opacity gap-1 w-16 relative -top-4">
+<div class="w-14 h-14 bg-election-amber rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(245,166,35,0.4)] border-4 border-warm-cream">
+<span class="material-symbols-outlined text-pure-white text-[28px]" style="font-variation-settings: 'FILL' 1;">mic</span>
+</div>
+<span class="mt-1">Voice</span>
+</button>
+<!-- Active Tab -->
+<button class="flex flex-col items-center justify-center text-[#F5A623] dark:text-[#F5A623] font-black hover:opacity-100 transition-opacity gap-1 w-16 scale-110">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">where_to_vote</span>
+<span>Locator</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#1A1A1A] dark:text-stone-400 opacity-60 hover:opacity-100 transition-opacity gap-1 w-16">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span>Me</span>
+</button>
+</nav>
+</body></html>
