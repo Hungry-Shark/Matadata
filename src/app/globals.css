@@ -1,0 +1,450 @@
+@import "tailwindcss";
+
+/* ================================================================
+   MataData Design System — Tailwind CSS v4 Theme Configuration
+   All tokens from DESIGN.md + Stitch design system
+   ================================================================ */
+
+@theme inline {
+  /* ---- Color Palette from Stitch ---- */
+  --color-primary-ink: #0A0A0A;
+  --color-amber-soft: #FFF3D6;
+  --color-on-secondary-fixed-variant: #474646;
+  --color-surface-container-high: #e8e8e4;
+  --color-on-surface-variant: #524534;
+  --color-text-muted: #9E9E9E;
+  --color-secondary-fixed: #e5e2e1;
+  --color-on-surface: #1a1c19;
+  --color-source-myneta: #8B1A1A;
+  --color-on-secondary: #ffffff;
+  --color-secondary-fixed-dim: #c9c6c5;
+  --color-on-tertiary-container: #004d6a;
+  --color-on-tertiary: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-pure-white: #FFFFFF;
+  --color-on-tertiary-fixed-variant: #004c69;
+  --color-on-secondary-fixed: #1c1b1b;
+  --color-on-error: #ffffff;
+  --color-on-primary: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-surface: #fafaf5;
+  --color-surface-dim: #dadad6;
+  --color-error: #ba1a1a;
+  --color-on-primary-fixed-variant: #633f00;
+  --color-source-eci: #1A6B3C;
+  --color-surface-container-low: #f4f4ef;
+  --color-surface-tint: #835500;
+  --color-text-secondary: #5C5C5C;
+  --color-primary: #835500;
+  --color-tertiary-fixed-dim: #7cd0ff;
+  --color-election-amber: #F5A623;
+  --color-secondary-container: #e5e2e1;
+  --color-on-primary-fixed: #291800;
+  --color-on-tertiary-fixed: #001e2c;
+  --color-primary-container: #f5a623;
+  --color-on-primary-container: #644000;
+  --color-inverse-surface: #2f312e;
+  --color-tertiary-container: #3ac2ff;
+  --color-on-background: #1a1c19;
+  --color-tertiary-fixed: #c4e7ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-deep-cream: #F0EBE0;
+  --color-surface-container-highest: #e2e3de;
+  --color-outline-variant: #d7c3ae;
+  --color-primary-fixed-dim: #ffb955;
+  --color-source-prs: #185FA5;
+  --color-amber-dark: #D4891A;
+  --color-secondary: #5f5e5e;
+  --color-inverse-on-surface: #f1f1ec;
+  --color-background: #fafaf5;
+  --color-surface-container: #eeeee9;
+  --color-tertiary: #00658a;
+  --color-alert-red: #D94F4F;
+  --color-outline: #857462;
+  --color-inverse-primary: #ffb955;
+  --color-success-green: #2D9F5C;
+  --color-on-secondary-container: #656464;
+  --color-warm-cream: #FAFAF5;
+  --color-surface-bright: #fafaf5;
+  --color-surface-variant: #e2e3de;
+  --color-primary-fixed: #ffddb4;
+
+  /* ---- Font Families ---- */
+  --font-display-xl: 'Epilogue', sans-serif;
+  --font-display-lg: 'Epilogue', sans-serif;
+  --font-display-md: 'Epilogue', sans-serif;
+  --font-body-xl: 'Plus Jakarta Sans', sans-serif;
+  --font-body-lg: 'Plus Jakarta Sans', sans-serif;
+  --font-body-md: 'Plus Jakarta Sans', sans-serif;
+  --font-body-sm: 'Plus Jakarta Sans', sans-serif;
+  --font-body-xs: 'Plus Jakarta Sans', sans-serif;
+  --font-mono-sm: 'Space Grotesk', monospace;
+
+  /* ---- Font Sizes (Tailwind v4 syntax) ---- */
+  --text-display-xl: 52px;
+  --text-display-xl--line-height: 1.05;
+  --text-display-xl--font-weight: 700;
+
+  --text-display-lg: 36px;
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--font-weight: 700;
+
+  --text-display-md: 28px;
+  --text-display-md--line-height: 1.2;
+  --text-display-md--font-weight: 700;
+
+  --text-body-xl: 20px;
+  --text-body-xl--line-height: 1.6;
+  --text-body-xl--font-weight: 400;
+
+  --text-body-lg: 17px;
+  --text-body-lg--line-height: 1.65;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 15px;
+  --text-body-md--line-height: 1.7;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 1.6;
+  --text-body-sm--font-weight: 400;
+
+  --text-body-xs: 11px;
+  --text-body-xs--line-height: 1.5;
+  --text-body-xs--font-weight: 500;
+
+  --text-mono-sm: 12px;
+  --text-mono-sm--line-height: 1.4;
+  --text-mono-sm--font-weight: 500;
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-full: 9999px;
+
+  /* ---- Box Shadows ---- */
+  --shadow-lift: 0 4px 14px 0 rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 10px 25px -5px rgba(0, 0, 0, 0.10);
+  --shadow-amber: 0 4px 20px rgba(245, 166, 35, 0.40);
+  --shadow-amber-glow: 0 0 30px rgba(245, 166, 35, 0.4);
+
+  /* ---- Spacing ---- */
+  --spacing-2xl: 32px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-lg: 16px;
+  --spacing-md: 12px;
+  --spacing-4xl: 64px;
+  --spacing-xl: 24px;
+  --spacing-3xl: 48px;
+
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
+  --spacing-safe-top: env(safe-area-inset-top);
+}
+
+/* ================================================================
+   Base Styles
+   ================================================================ */
+
+:root {
+  /* Animation tokens */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 320ms;
+  --duration-slower: 400ms;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  line-height: 1.7;
+  overscroll-behavior: none;
+  min-height: 100dvh;
+}
+
+/* ================================================================
+   Typography Utilities
+   ================================================================ */
+
+@utility text-display-xl {
+  font-family: var(--font-display-xl);
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+@utility text-display-lg {
+  font-family: var(--font-display-lg);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+@utility text-display-md {
+  font-family: var(--font-display-md);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-body-xl {
+  font-family: var(--font-body-xl);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+@utility text-body-lg {
+  font-family: var(--font-body-lg);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+@utility text-body-md {
+  font-family: var(--font-body-md);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+@utility text-body-sm {
+  font-family: var(--font-body-sm);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+@utility text-body-xs {
+  font-family: var(--font-body-xs);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@utility text-mono-sm {
+  font-family: var(--font-mono-sm);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@utility font-display-xl { font-family: var(--font-display-xl); }
+@utility font-display-lg { font-family: var(--font-display-lg); }
+@utility font-display-md { font-family: var(--font-display-md); }
+@utility font-body-xl { font-family: var(--font-body-xl); }
+@utility font-body-lg { font-family: var(--font-body-lg); }
+@utility font-body-md { font-family: var(--font-body-md); }
+@utility font-body-sm { font-family: var(--font-body-sm); }
+@utility font-body-xs { font-family: var(--font-body-xs); }
+@utility font-mono-sm { font-family: var(--font-mono-sm); }
+
+/* ================================================================
+   Spacing Utilities (Tailwind v4: custom tokens need explicit @utility)
+   Maps px-xs/sm/md/lg/xl/2xl/3xl/4xl → actual CSS padding/margin/gap
+   ================================================================ */
+
+@utility p-xs   { padding: 4px; }
+@utility p-sm   { padding: 8px; }
+@utility p-md   { padding: 12px; }
+@utility p-lg   { padding: 16px; }
+@utility p-xl   { padding: 24px; }
+@utility p-2xl  { padding: 32px; }
+@utility p-3xl  { padding: 48px; }
+@utility p-4xl  { padding: 64px; }
+
+@utility px-xs  { padding-left: 4px;  padding-right: 4px; }
+@utility px-sm  { padding-left: 8px;  padding-right: 8px; }
+@utility px-md  { padding-left: 12px; padding-right: 12px; }
+@utility px-lg  { padding-left: 16px; padding-right: 16px; }
+@utility px-xl  { padding-left: 24px; padding-right: 24px; }
+@utility px-2xl { padding-left: 32px; padding-right: 32px; }
+@utility px-3xl { padding-left: 48px; padding-right: 48px; }
+@utility px-4xl { padding-left: 64px; padding-right: 64px; }
+
+@utility py-xs  { padding-top: 4px;  padding-bottom: 4px; }
+@utility py-sm  { padding-top: 8px;  padding-bottom: 8px; }
+@utility py-md  { padding-top: 12px; padding-bottom: 12px; }
+@utility py-lg  { padding-top: 16px; padding-bottom: 16px; }
+@utility py-xl  { padding-top: 24px; padding-bottom: 24px; }
+@utility py-2xl { padding-top: 32px; padding-bottom: 32px; }
+@utility py-3xl { padding-top: 48px; padding-bottom: 48px; }
+
+@utility pt-xs  { padding-top: 4px; }
+@utility pt-sm  { padding-top: 8px; }
+@utility pt-md  { padding-top: 12px; }
+@utility pt-lg  { padding-top: 16px; }
+@utility pt-xl  { padding-top: 24px; }
+@utility pt-2xl { padding-top: 32px; }
+@utility pt-3xl { padding-top: 48px; }
+@utility pt-4xl { padding-top: 64px; }
+
+@utility pb-xs  { padding-bottom: 4px; }
+@utility pb-sm  { padding-bottom: 8px; }
+@utility pb-md  { padding-bottom: 12px; }
+@utility pb-lg  { padding-bottom: 16px; }
+@utility pb-xl  { padding-bottom: 24px; }
+@utility pb-2xl { padding-bottom: 32px; }
+@utility pb-4xl { padding-bottom: 64px; }
+
+@utility pl-xl  { padding-left: 24px; }
+@utility pr-xl  { padding-right: 24px; }
+
+@utility m-xs   { margin: 4px; }
+@utility m-sm   { margin: 8px; }
+@utility m-md   { margin: 12px; }
+@utility m-lg   { margin: 16px; }
+@utility m-xl   { margin: 24px; }
+@utility m-2xl  { margin: 32px; }
+
+@utility mx-xs  { margin-left: 4px;  margin-right: 4px; }
+@utility mx-sm  { margin-left: 8px;  margin-right: 8px; }
+@utility mx-xl  { margin-left: 24px; margin-right: 24px; }
+
+@utility mt-xs  { margin-top: 4px; }
+@utility mt-sm  { margin-top: 8px; }
+@utility mt-md  { margin-top: 12px; }
+@utility mt-lg  { margin-top: 16px; }
+@utility mt-xl  { margin-top: 24px; }
+@utility mt-2xl { margin-top: 32px; }
+@utility mt-3xl { margin-top: 48px; }
+@utility mt-4xl { margin-top: 64px; }
+
+@utility mb-xs  { margin-bottom: 4px; }
+@utility mb-sm  { margin-bottom: 8px; }
+@utility mb-md  { margin-bottom: 12px; }
+@utility mb-lg  { margin-bottom: 16px; }
+@utility mb-xl  { margin-bottom: 24px; }
+@utility mb-2xl { margin-bottom: 32px; }
+@utility mb-3xl { margin-bottom: 48px; }
+@utility mb-4xl { margin-bottom: 64px; }
+
+@utility gap-xs  { gap: 4px; }
+@utility gap-sm  { gap: 8px; }
+@utility gap-md  { gap: 12px; }
+@utility gap-lg  { gap: 16px; }
+@utility gap-xl  { gap: 24px; }
+@utility gap-2xl { gap: 32px; }
+@utility gap-3xl { gap: 48px; }
+
+@utility -mx-xl { margin-left: -24px; margin-right: -24px; }
+
+/* ================================================================
+   Space-Y Utilities — regular CSS (not @utility, > * + * not supported)
+   ================================================================ */
+.space-y-xs > * + *  { margin-top: 4px; }
+.space-y-sm > * + *  { margin-top: 8px; }
+.space-y-md > * + *  { margin-top: 12px; }
+.space-y-lg > * + *  { margin-top: 16px; }
+.space-y-xl > * + *  { margin-top: 24px; }
+.space-y-2xl > * + * { margin-top: 32px; }
+/* ================================================================
+   Skeleton Shimmer Animation
+   ================================================================ */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-cream-deep) 25%,
+    #e8e3d8 37%,
+    var(--color-cream-deep) 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: var(--radius-md);
+}
+
+/* ================================================================
+   Scrollbar Utilities
+   ================================================================ */
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================================================================
+   PWA / Mobile Optimizations
+   ================================================================ */
+
+/* Prevent pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 2px;
+}
+
+/* Touch targets minimum 44px */
+button, a, input, select, textarea {
+  min-height: 44px;
+}
+
+/* Small interactive elements that need smaller min-height */
+.chip, .badge, .source-chip {
+  min-height: auto;
+}
+
+/* Amber orb pulse animation */
+@keyframes pulse-orb {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.animate-pulse-orb {
+  animation: pulse-orb 2s ease-in-out infinite;
+}
+
+/* Streaming dots animation */
+@keyframes dot-fade {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.animate-dot-1 { animation: dot-fade 1.2s ease-in-out infinite; }
+.animate-dot-2 { animation: dot-fade 1.2s ease-in-out 0.4s infinite; }
+.animate-dot-3 { animation: dot-fade 1.2s ease-in-out 0.8s infinite; }
+
+/* Number flip animation for countdown */
+@keyframes flip-down {
+  0% { transform: perspective(400px) rotateX(0deg); }
+  100% { transform: perspective(400px) rotateX(-90deg); }
+}
+
+/* Safe area padding utility */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
