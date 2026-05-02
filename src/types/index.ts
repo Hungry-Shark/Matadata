@@ -23,7 +23,7 @@ export interface User {
 }
 
 // ---- Language ----
-export type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'bn' | 'te' | 'mr' | 'ta' | 'gu' | 'kn';
 
 // ---- Constituency ----
 export interface Constituency {

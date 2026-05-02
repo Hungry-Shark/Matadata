@@ -63,7 +63,13 @@ export const useAppStore = create<AppState>()(
 
       clearUser: () => set({ user: null }),
 
-      setLanguage: (language) => set({ language }),
+      setLanguage: (language) => {
+        // Set cookie so server-side next-intl can resolve locale on next request
+        if (typeof document !== 'undefined') {
+          document.cookie = `locale=${language};path=/;max-age=31536000;SameSite=Lax`;
+        }
+        set({ language });
+      },
 
       setConstituency: (constituency) => set({ constituency }),
 
