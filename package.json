@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@deepgram/sdk": "^5.1.0",
+    "@google-cloud/text-to-speech": "^6.4.1",
     "@google/genai": "^1.51.0",
     "@google/generative-ai": "^0.24.1",
     "ai": "^6.0.171",
@@ -21,6 +22,7 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
+    "next-intl": "^4.11.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tailwind-merge": "^3.5.0",
