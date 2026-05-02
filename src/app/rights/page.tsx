@@ -5,9 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ProfileDrawer } from '@/components/navigation/ProfileDrawer';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
-const CATEGORIES = ['All Rights', 'Registration', 'Polling Day', 'Disabilities', 'Grievances'];
+const CATEGORY_KEYS = ['cat_all', 'cat_fundamental', 'cat_electoral', 'cat_protections', 'cat_rti'] as const;
+const CATEGORY_FILTER_MAP: Record<string, string> = {
+  cat_all: 'All',
+  cat_fundamental: 'Fundamental',
+  cat_electoral: 'Electoral',
+  cat_protections: 'Protections',
+  cat_rti: 'RTI',
+};
 
 const RIGHTS = [
   { id: '326', type: 'Constitutional Right', title: 'Right to Vote (Universal Adult Suffrage)', article: 'Article 326, Constitution of India', description: 'Article 326 of the Constitution of India provides that the elections to the House of the People and to the Legislative Assembly of every State shall be on the basis of adult suffrage. This means every citizen of India who is 18 years of age or older has the right to vote, irrespective of caste, religion, race, or gender.', note: 'Exceptions include non-residence, unsoundness of mind, or criminal disqualification.', icon: 'account_balance', category: 'Polling Day' },
@@ -18,17 +26,21 @@ const RIGHTS = [
 
 export default function RightsPage() {
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState('All Rights');
+  const t = useTranslations('rights');
+  const [activeCatKey, setActiveCatKey] = useState<string>('cat_all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  const filtered = activeCategory === 'All Rights' ? RIGHTS : RIGHTS.filter((r) => r.category === activeCategory);
+  const filterValue = CATEGORY_FILTER_MAP[activeCatKey] || 'All';
+  const filtered = filterValue === 'All'
+    ? RIGHTS
+    : RIGHTS.filter((r) => r.category === filterValue);
 
   return (
     <div className="bg-warm-cream min-h-screen text-primary-ink font-body-md selection:bg-election-amber/30 pb-3xl">
       {/* TopAppBar */}
       <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#FFFDF5] border-b border-stone-200">
-        <button onClick={() => window.history.back()} className="text-stone-900 hover:bg-stone-100 transition-colors rounded-full p-2 scale-95 active:duration-150">
+        <button onClick={() => router.back()} className="text-stone-900 hover:bg-stone-100 transition-colors rounded-full p-2 active:scale-90">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div className="font-display-lg text-2xl font-black italic tracking-tighter text-stone-900">
@@ -42,19 +54,19 @@ export default function RightsPage() {
       <main className="pt-24 px-4 pb-28 w-full flex flex-col gap-6 overflow-x-hidden">
         {/* Header & Search */}
         <section className="space-y-lg">
-          <h1 className="font-display-lg text-display-lg text-primary-ink">Voter Rights</h1>
-          <p className="font-body-lg text-body-lg text-text-secondary">Understand your constitutional rights and protections as an Indian voter.</p>
+          <h1 className="font-display-lg text-display-lg text-primary-ink">{t('title')}</h1>
+          <p className="font-body-lg text-body-lg text-text-secondary">{t('subtitle')}</p>
           <div className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <span className="material-symbols-outlined text-text-muted">search</span>
             </div>
             <input 
               className="block w-full pl-12 pr-12 py-4 bg-deep-cream border-none rounded-full font-body-md text-primary-ink placeholder-text-muted focus:ring-2 focus:ring-election-amber shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] transition-shadow" 
-              placeholder="Search rights, articles, or topics..." 
+              placeholder={t('searchPlaceholder')} 
               type="text"
             />
             <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
-              <button className="p-2 text-election-amber hover:text-amber-dark transition-colors rounded-full">
+              <button onClick={() => router.push('/voice')} className="p-2 text-election-amber hover:text-amber-dark transition-colors rounded-full">
                 <span className="material-symbols-outlined">mic</span>
               </button>
             </div>
@@ -63,18 +75,18 @@ export default function RightsPage() {
 
         {/* Category Chips */}
         <section className="flex space-x-md overflow-x-auto pb-4 -mx-xl px-xl scrollbar-hide snap-x">
-          {CATEGORIES.map((cat) => (
-            <button 
-              key={cat} 
-              onClick={() => setActiveCategory(cat)}
+          {CATEGORY_KEYS.map((key) => (
+            <button
+              key={key}
+              onClick={() => setActiveCatKey(key)}
               className={cn(
                 "whitespace-nowrap px-lg py-sm rounded-full font-body-sm text-body-sm snap-start shrink-0 transition-colors",
-                activeCategory === cat 
-                  ? "bg-primary-ink text-pure-white" 
+                activeCatKey === key
+                  ? "bg-primary-ink text-pure-white"
                   : "bg-pure-white text-primary-ink border border-surface-container-highest hover:bg-deep-cream"
               )}
             >
-              {cat}
+              {t(key)}
             </button>
           ))}
         </section>
@@ -144,7 +156,7 @@ export default function RightsPage() {
                         onClick={(e) => { e.stopPropagation(); router.push('/chat'); }}
                         className="w-full flex items-center justify-between px-lg py-4 bg-primary-ink text-pure-white rounded-full hover:bg-stone-800 transition-colors active:scale-95 group"
                       >
-                        <span className="font-body-md text-body-md font-semibold">Ask AI to explain this</span>
+                        <span className="font-body-md text-body-md font-semibold">{t('askAi')}</span>
                         <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                       </button>
                     </motion.div>

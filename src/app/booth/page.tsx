@@ -1,254 +1,148 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BottomNav } from '@/components/navigation/BottomNav';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/appStore';
+import { useTranslations } from 'next-intl';
+import { BottomNav } from '@/components/navigation/BottomNav';
+import { ProfileDrawer } from '@/components/navigation/ProfileDrawer';
 
-interface Booth {
-  id: string;
-  name: string;
-  address: string;
-  distance: string;
-  lat: number;
-  lng: number;
-  waitTime?: string;
-}
+const SPRING = { type: 'spring' as const, stiffness: 380, damping: 32 };
 
-// Mock booth data relative to user location (real app would fetch from ECI API)
-function generateNearbyBooths(lat: number, lng: number): Booth[] {
-  const offsets = [
-    { dlat: 0.003, dlng: 0.004, name: 'Primary School, Sector 12', address: 'Block A, Room 1, Urban Estate', wait: '~5 mins' },
-    { dlat: -0.005, dlng: 0.002, name: 'Community Hall, Ward 7', address: 'Near Main Market, Opp. Post Office', wait: '~12 mins' },
-    { dlat: 0.007, dlng: -0.003, name: 'Govt. Inter College', address: 'Civil Lines, Gate No. 2', wait: '~8 mins' },
-  ];
+export default function BoothPage() {
+  const router = useRouter();
+  const { constituency, pincode } = useAppStore();
+  const t = useTranslations('booth');
+  const [searchInput, setSearchInput] = useState(pincode || '');
+  const [loading, setLoading] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [result, setResult] = useState<null | {
+    boothName: string; address: string; distance: string;
+  }>(null);
 
-  return offsets.map((o, i) => {
-    const dlat = Math.abs(o.dlat);
-    const dlng = Math.abs(o.dlng);
-    const distKm = Math.sqrt(dlat * dlat + dlng * dlng) * 111;
-    return {
-      id: String(i + 1),
-      name: o.name,
-      address: o.address,
-      distance: `${distKm.toFixed(1)} km`,
-      lat: lat + o.dlat,
-      lng: lng + o.dlng,
-      waitTime: o.wait,
-    };
-  });
-}
-
-export default function BoothLocatorPage() {
-  const { constituency } = useAppStore();
-  const [userLat, setUserLat] = useState<number | null>(null);
-  const [userLng, setUserLng] = useState<number | null>(null);
-  const [booths, setBooths] = useState<Booth[]>([]);
-  const [selectedBooth, setSelectedBooth] = useState<Booth | null>(null);
-  const [gpsError, setGpsError] = useState('');
-  const [locating, setLocating] = useState(false);
-  const [locationName, setLocationName] = useState('');
-
-  const locate = () => {
-    if (!navigator.geolocation) {
-      setGpsError('Geolocation is not supported by your browser.');
-      return;
-    }
-    setLocating(true);
-    setGpsError('');
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setUserLat(latitude);
-        setUserLng(longitude);
-
-        // Reverse-geocode to get human-readable location
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-          );
-          const geo = await res.json();
-          const name = geo?.address?.suburb || geo?.address?.neighbourhood || geo?.address?.city || geo?.address?.county || 'Your Location';
-          setLocationName(name);
-        } catch {
-          setLocationName('Your Location');
-        }
-
-        const nearby = generateNearbyBooths(latitude, longitude);
-        setBooths(nearby);
-        setSelectedBooth(nearby[0]);
-        setLocating(false);
-      },
-      () => {
-        setGpsError('Could not access your location. Please enable location access in your browser.');
-        setLocating(false);
-        // Fall back to mock data so the UI isn't empty
-        const fallbackLat = 25.3478;
-        const fallbackLng = 82.9988;
-        setUserLat(fallbackLat);
-        setUserLng(fallbackLng);
-        setLocationName(constituency?.name || 'Your Constituency');
-        const nearby = generateNearbyBooths(fallbackLat, fallbackLng);
-        setBooths(nearby);
-        setSelectedBooth(nearby[0]);
-      }
-    );
+  const handleSearch = () => {
+    if (!searchInput.trim()) return;
+    setLoading(true);
+    // Simulate fetch — replace with real Booth Locator API call
+    setTimeout(() => {
+      setResult({
+        boothName: `Polling Booth ${searchInput.slice(-3)}`,
+        address: `Government School, Ward ${searchInput.slice(-2)}, ${constituency?.name || 'Your Constituency'}`,
+        distance: '0.8 km',
+      });
+      setLoading(false);
+    }, 900);
   };
 
-  useEffect(() => {
-    locate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const mapUrl = userLat && userLng
-    ? `https://www.openstreetmap.org/export/embed.html?bbox=${userLng - 0.015},${userLat - 0.012},${userLng + 0.015},${userLat + 0.012}&layer=mapnik&marker=${userLat},${userLng}`
-    : null;
-
   return (
-    <div className="bg-warm-cream font-body-md text-on-surface h-screen w-screen overflow-hidden flex flex-col relative">
-      {/* TopAppBar */}
-      <header className="bg-pure-white border-b border-surface-variant font-bold tracking-tight flex justify-between items-center w-full px-4 py-3 z-10 shrink-0">
-        <h1 className="text-[18px] font-black text-primary-ink">Booth Locator</h1>
-        <button
-          onClick={locate}
-          disabled={locating}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-soft text-amber-dark text-[13px] font-semibold disabled:opacity-60 transition-opacity"
-        >
-          <span className="material-symbols-outlined text-[16px]">my_location</span>
-          {locating ? 'Locating…' : 'Refresh'}
+    <div className="min-h-dvh flex flex-col" style={{ background: '#FAFAF5' }}>
+      {/* Header */}
+      <header className="fixed top-0 left-0 w-full h-16 z-50 flex items-center justify-between px-4 bg-[#FAFAF5] border-b border-[#e2e3de]">
+        <button onClick={() => router.back()} className="p-2 rounded-full active:scale-90 transition-transform">
+          <span className="material-symbols-outlined" style={{ color: '#0A0A0A' }}>arrow_back</span>
+        </button>
+        <h1 className="text-[20px] font-black italic tracking-tighter" style={{ color: '#0A0A0A', fontFamily: 'Epilogue, sans-serif' }}>
+          {t('boothLocator')}
+        </h1>
+        <button onClick={() => setProfileOpen(true)} className="w-9 h-9 rounded-full bg-[#e8e8e4] flex items-center justify-center active:scale-90 transition-transform">
+          <span className="material-symbols-outlined text-[20px]" style={{ color: '#524534' }}>person</span>
         </button>
       </header>
 
-      {/* Map Canvas */}
-      <main className="flex-grow relative w-full h-full overflow-hidden">
-
-        {/* Map — real OSM embed when location is known */}
-        {mapUrl ? (
-          <iframe
-            key={mapUrl}
-            src={mapUrl}
-            className="absolute inset-0 w-full h-full border-0"
-            title="Polling booth map"
-            loading="lazy"
-          />
-        ) : (
-          <div
-            className="absolute inset-0 bg-deep-cream"
-            style={{
-              backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuA6VvomcAUftsYniwCul303IYs42Y0VDDy5-2KAf9oeURBNrw8hUPV_iX08up9NZQfqZqcQlSR25PqnBqTuzxOweZRPhnlIX-42yI7ewJ2cppqq7_Ntl4n-2Hgx_Ie0Q1sdIdq7ubQh-0RT9FlNonfp273OgmQhLG-VR_NhrilHatet8-suW8FqVY5B3CNkH_6c5fJfjX0DWYzGXFEbgDEz89QeKN1cRxJ2iVX7C8g7tDg4ho7E98OX6OCsV17eSdbU-j4ieB21WqM0')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            <div className="absolute inset-0 bg-warm-cream/40 backdrop-blur-[2px]" />
+      <main className="flex-1 px-4 pt-24 pb-28 flex flex-col gap-5 w-full">
+        {/* Intro */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={SPRING}
+          className="rounded-2xl p-5 flex flex-col gap-2"
+          style={{ background: '#F5A623', boxShadow: '0 4px 20px rgba(245,166,35,0.25)' }}>
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[28px]" style={{ color: '#0A0A0A', fontVariationSettings: "'FILL' 1" }}>where_to_vote</span>
+            <h2 style={{ fontFamily: 'Epilogue, sans-serif', fontSize: '20px', fontWeight: 800, color: '#0A0A0A' }}>{t('title')}</h2>
           </div>
-        )}
+          <p style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '14px', color: 'rgba(10,10,10,0.7)' }}>
+            {t('subtitle')}
+          </p>
+        </motion.div>
 
-        {/* Loading overlay */}
-        <AnimatePresence>
-          {locating && (
-            <motion.div
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-warm-cream/80 backdrop-blur-sm gap-3"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            >
-              <div className="w-10 h-10 border-4 border-election-amber/30 border-t-election-amber rounded-full animate-spin" />
-              <p className="text-[14px] font-semibold text-primary-ink">Finding your location…</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Search card */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.06 }}
+          className="rounded-2xl p-5 flex flex-col gap-4"
+          style={{ background: '#FFFFFF', boxShadow: '0 2px 16px rgba(0,0,0,0.07)', border: '1px solid #e2e3de' }}>
 
-        {/* GPS error banner */}
-        {gpsError && (
-          <div className="absolute top-3 left-3 right-3 z-20 bg-red-50 border border-red-200 rounded-xl px-4 py-2 text-[12px] text-alert-red flex items-center gap-2">
-            <span className="material-symbols-outlined text-[16px]">warning</span>
-            {gpsError}
+          {/* Pincode input */}
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9E9E9E', fontSize: '20px' }}>search</span>
+            <input type="text" inputMode="numeric" maxLength={6} placeholder={t('pincodeLabel')}
+              value={searchInput} onChange={e => setSearchInput(e.target.value.replace(/\D/g, ''))}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              className="w-full h-14 rounded-xl pl-12 pr-4 focus:outline-none transition-shadow focus:ring-2"
+              style={{ background: '#F0EBE0', border: 'none', fontFamily: 'Space Grotesk, sans-serif', fontSize: '18px', letterSpacing: '0.2em', color: '#0A0A0A' }} />
           </div>
-        )}
 
-        {/* Location label chip */}
-        {locationName && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 bg-pure-white/90 backdrop-blur-md border border-outline-variant rounded-full px-4 py-1.5 flex items-center gap-1.5 shadow-sm">
-            <span className="material-symbols-outlined text-election-amber text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
-            <span className="text-[12px] font-semibold text-primary-ink">{locationName}</span>
+          <div className="flex gap-3">
+            <motion.button onClick={handleSearch} disabled={loading} whileTap={{ scale: 0.96 }} transition={SPRING}
+              className="flex-1 h-12 rounded-full flex items-center justify-center gap-2 disabled:opacity-60"
+              style={{ background: '#0A0A0A', color: '#FFFFFF', fontFamily: 'Plus Jakarta Sans', fontSize: '15px', fontWeight: 600 }}>
+              {loading
+                ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : <><span className="material-symbols-outlined text-[18px]">search</span> {t('searchBtn')}</>}
+            </motion.button>
+
+            <motion.button
+              onClick={() => {
+                if (!navigator.geolocation) return;
+                navigator.geolocation.getCurrentPosition(pos => {
+                  console.log(pos.coords);
+                  handleSearch();
+                });
+              }}
+              whileTap={{ scale: 0.96 }} transition={SPRING}
+              className="h-12 px-4 rounded-full flex items-center justify-center gap-2"
+              style={{ border: '2px solid #e2e3de', background: '#FFFFFF', color: '#0A0A0A', fontFamily: 'Plus Jakarta Sans', fontSize: '15px', fontWeight: 600 }}>
+              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>my_location</span>
+            </motion.button>
           </div>
-        )}
+        </motion.div>
 
-        {/* Recenter button */}
-        <button
-          onClick={locate}
-          aria-label="Center Map"
-          className="absolute top-16 right-3 z-20 bg-pure-white p-2.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.1)] active:scale-95 transition-transform"
-        >
-          <span className="material-symbols-outlined text-primary-ink text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>my_location</span>
-        </button>
-
-        {/* Bottom Sheet */}
-        <AnimatePresence>
-          {selectedBooth && (
-            <motion.div
-              className="absolute bottom-[72px] left-0 right-0 z-30 px-4 pb-2"
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 100, opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            >
-              {/* Booth selector pills */}
-              <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar pb-1">
-                {booths.map(b => (
-                  <button
-                    key={b.id}
-                    onClick={() => setSelectedBooth(b)}
-                    className={`shrink-0 text-[12px] font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                      selectedBooth.id === b.id
-                        ? 'bg-election-amber text-pure-white border-election-amber'
-                        : 'bg-pure-white text-text-secondary border-surface-variant'
-                    }`}
-                  >
-                    {b.distance}
-                  </button>
-                ))}
+        {/* Result card */}
+        {result && (
+          <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={SPRING}
+            className="rounded-2xl p-5 flex flex-col gap-4"
+            style={{ background: '#FFFFFF', boxShadow: '0 2px 16px rgba(0,0,0,0.07)', border: '1px solid #e2e3de' }}>
+            <div className="flex items-start gap-3">
+              <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: '#e5f8ee' }}>
+                <span className="material-symbols-outlined" style={{ color: '#2D9F5C', fontVariationSettings: "'FILL' 1" }}>check_circle</span>
               </div>
-
-              {/* Card */}
-              <div className="bg-pure-white rounded-[20px] shadow-[0_-4px_20px_rgba(0,0,0,0.1)] p-4 border border-surface-variant flex flex-col gap-3">
-                <div className="w-10 h-1 bg-surface-variant rounded-full mx-auto -mt-1" />
-
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[11px] font-bold text-election-amber uppercase tracking-wider">Nearest Booth</span>
-                    <h2 className="text-[16px] font-bold text-primary-ink leading-tight">{selectedBooth.name}</h2>
-                    <p className="text-[13px] text-text-secondary">{selectedBooth.address}</p>
-                  </div>
-                  <div className="bg-amber-soft border border-election-amber/30 rounded-xl px-3 py-2 flex flex-col items-center justify-center min-w-[58px]">
-                    <span className="text-[18px] font-black text-amber-dark leading-none">{selectedBooth.distance.replace(' km', '')}</span>
-                    <span className="text-[10px] text-primary-ink">km</span>
-                  </div>
-                </div>
-
-                {selectedBooth.waitTime && (
-                  <div className="flex items-center gap-2 bg-[#E8F5E9] p-3 rounded-xl">
-                    <span className="material-symbols-outlined text-success-green text-[18px]">schedule</span>
-                    <span className="text-[13px] text-primary-ink font-medium">Estimated wait:</span>
-                    <span className="text-[13px] text-success-green font-bold ml-auto">{selectedBooth.waitTime}</span>
-                  </div>
-                )}
-
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedBooth.lat},${selectedBooth.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-election-amber text-pure-white font-bold py-3 rounded-full shadow-[0_4px_12px_rgba(245,166,35,0.3)] active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-[15px]"
-                >
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>directions</span>
-                  Get Directions
-                </a>
+              <div className="flex flex-col gap-0.5">
+                <h3 style={{ fontFamily: 'Epilogue', fontSize: '17px', fontWeight: 700, color: '#0A0A0A' }}>{result.boothName}</h3>
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontSize: '13px', color: '#5C5C5C' }}>{result.address}</p>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-xl" style={{ background: '#F0EBE0' }}>
+              <span className="material-symbols-outlined text-[18px]" style={{ color: '#F5A623', fontVariationSettings: "'FILL' 1" }}>directions_walk</span>
+              <span style={{ fontFamily: 'Plus Jakarta Sans', fontSize: '14px', fontWeight: 600, color: '#0A0A0A' }}>{t('fromLocation', { distance: result.distance })}</span>
+            </div>
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result.address)}`}
+              target="_blank" rel="noopener noreferrer"
+              className="w-full h-12 rounded-full flex items-center justify-center gap-2"
+              style={{ background: '#F5A623', color: '#0A0A0A', fontFamily: 'Plus Jakarta Sans', fontSize: '15px', fontWeight: 700, boxShadow: '0 4px 12px rgba(245,166,35,0.3)', textDecoration: 'none' }}>
+              <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+              {t('openMaps')}
+            </a>
+          </motion.div>
+        )}
+
+        {/* Info note */}
+        {!result && (
+          <p className="text-center text-[13px]" style={{ color: '#9E9E9E', fontFamily: 'Plus Jakarta Sans' }}>
+            {t('boothData')}
+          </p>
+        )}
       </main>
 
       <BottomNav />
+      <ProfileDrawer isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
     </div>
   );
 }

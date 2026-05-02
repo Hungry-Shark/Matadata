@@ -6,42 +6,52 @@ import { useRouter, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import type { ChatMessage } from '@/types';
 
-// ── Mock candidate data (replace with Firestore fetch) ──────────────────────
-const CANDIDATES: Record<string, {
-  id: string; name: string; party: string; partyColor: string; status: string;
-  age: number; education: string; constituency: string; state: string;
-  assets: string; liabilities: string; casesCount: number; cases: string[];
-  attendancePct: number | null; billsIntroduced: number; questionsAsked: number;
-  avatar: string; bio: string; sources: string[];
-}> = {
-  '1': {
-    id: '1', name: 'Ramesh Kumar', party: 'BJP', partyColor: '#FF6600', status: 'Incumbent',
-    age: 54, education: 'B.A.', constituency: 'Chandauli', state: 'Uttar Pradesh',
-    assets: '₹12 Cr', liabilities: '₹1.2 Cr', casesCount: 2,
-    cases: ['IPC 420 (Cheating) — pending since 2019', 'IPC 406 (Criminal breach of trust) — pending since 2021'],
-    attendancePct: 89, billsIntroduced: 3, questionsAsked: 47,
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuACydp702QUVJ_sy2LBjqXvMRM7oBGoOPWu-d81uoRlcszE6OuWipXdd9LherEifHLLfVRNJ1Q51c8Nck9YHmzz38SYp11g5L1gL-6HfBrCJmWk1baokG8YO_qdzq79eLQim9EhSkMcPpeS_SlDjMYAmm02ec3fn2NoVUbeoYQ0qADxbHvRyCsmHj8l5BQy-TJlJuUqHMV2TO69HwrHtVn5aw2oYFFJo6PuMz9LRZ0Wo3BLCv6nk6lzOjQZfux-XBtnaMtsgjua9-zA',
-    bio: 'Two-term Member of Parliament representing Chandauli constituency. Served on the Standing Committee on Agriculture.',
-    sources: ['ECI Data', 'PRS Legislative', 'MyNeta'],
-  },
-  '2': {
-    id: '2', name: 'Anita Singh', party: 'INC', partyColor: '#00ADEF', status: 'Challenger',
-    age: 41, education: 'M.A. Political Science', constituency: 'Chandauli', state: 'Uttar Pradesh',
-    assets: '₹4.5 Cr', liabilities: '₹0', casesCount: 0, cases: [],
-    attendancePct: null, billsIntroduced: 0, questionsAsked: 0,
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfzUks1_HhpQWe5LdzKzccXozZ9R_4Zi5SVOUyLs-VuhwygmP7uYRq6VwGYE2alleC1KgXiFb1MlZBlr95t0mentnLtT9ncST8Iv7qjd9C3zRgaBa-HZ-3KOP-nFsM5drDhT7bCkg-ccD7k4Jbr1nZJB0JW1Pnez-vLiimF9Z1bLy3_vi9LKy8nYot1OjsTIQJfpxjzUnN95FxQ_tHoUdMTwIa6u9Y71UocUy4jTvRfeNv1deQxmljVPhx6cypPiHl0_UgYUolpt0j',
-    bio: 'First-time candidate and grassroots organiser. Former district-level panchayat official with a focus on women\'s rights.',
-    sources: ['ECI Data', 'MyNeta'],
-  },
-};
-
+// ── Source citation styles ──────────────────────────────────────────
 const srcStyles: Record<string, string> = {
-  'ECI Data': 'bg-[#1A6B3C]/10 text-[#1A6B3C] border-[#1A6B3C]/20',
-  'PRS Legislative': 'bg-[#003B7A]/10 text-[#003B7A] border-[#003B7A]/20',
-  'MyNeta': 'bg-[#7B2D8B]/10 text-[#7B2D8B] border-[#7B2D8B]/20',
+  'myneta': 'bg-[#7B2D8B]/10 text-[#7B2D8B] border-[#7B2D8B]/20',
+  'prs': 'bg-[#003B7A]/10 text-[#003B7A] border-[#003B7A]/20',
+  'eci': 'bg-[#1A6B3C]/10 text-[#1A6B3C] border-[#1A6B3C]/20',
 };
 
-// ── Mini chat bubble ──────────────────────────────────────────────────────────
+const PARTY_COLORS: Record<string, string> = {
+  BJP: '#FF9933',
+  INC: '#19AAED',
+  SP: '#E82029',
+  AAP: '#0077B6',
+  BSP: '#22409A',
+  TMC: '#20C646',
+  DMK: '#E72D36',
+  NCP: '#004B87',
+  IND: '#666666',
+};
+
+// ── Types ──────────────────────────────────────────────────────────
+interface CandidateDetail {
+  id: string;
+  name: string;
+  party: string;
+  constituency: string;
+  state: string;
+  isWinner: boolean;
+  age?: string;
+  education?: string;
+  profession?: string;
+  totalAssets?: string;
+  totalLiabilities?: string;
+  criminalCases?: number;
+  seriousCases?: number;
+  caseDetails?: string;
+  selfProfession?: string;
+  spouseProfession?: string;
+  mynetaUrl?: string;
+  prsUrl?: string;
+  attendance?: string;
+  questionsAsked?: number;
+  debatesParticipated?: number;
+  privateBills?: number;
+}
+
+// ── Mini chat bubble ──────────────────────────────────────────────
 function ChatBubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user';
   return (
@@ -67,13 +77,33 @@ export default function CandidateDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
-  const candidate = CANDIDATES[id];
 
+  const [candidate, setCandidate] = useState<CandidateDetail | null>(null);
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'overview' | 'record' | 'chat'>('overview');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch candidate data from API
+  useEffect(() => {
+    async function fetchCandidate() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/candidates?id=${encodeURIComponent(id)}`);
+        const data = await res.json();
+        if (data.candidate) {
+          setCandidate(data.candidate);
+        }
+      } catch (err) {
+        console.warn('Could not fetch candidate:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (id) fetchCandidate();
+  }, [id]);
 
   // Pre-seed the chat with a context message
   useEffect(() => {
@@ -81,7 +111,7 @@ export default function CandidateDetailPage() {
     setChatMessages([{
       id: 'intro',
       role: 'assistant',
-      content: `I have full data on ${candidate.name} (${candidate.party}). Ask me anything — their criminal cases, assets, attendance, or voting record.`,
+      content: `I have verified data on ${candidate.name} (${candidate.party}, ${candidate.constituency}). Ask me anything — their criminal cases, assets, attendance, or voting record. All data is from official ECI affidavits.`,
       timestamp: new Date().toISOString(),
     }]);
   }, [candidate]);
@@ -93,7 +123,7 @@ export default function CandidateDetailPage() {
   const sendChat = useCallback(async (text: string) => {
     if (!text.trim() || chatLoading || !candidate) return;
     const userMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', content: text.trim(), timestamp: new Date().toISOString() };
-    const contextPrefix = `Regarding candidate ${candidate.name} (${candidate.party}, ${candidate.constituency}, ${candidate.state}): assets ${candidate.assets}, ${candidate.casesCount} criminal cases, attendance ${candidate.attendancePct ?? 'N/A'}%. `;
+    const contextPrefix = `Regarding candidate ${candidate.name} (${candidate.party}, ${candidate.constituency}, ${candidate.state}): assets ${candidate.totalAssets || 'N/A'}, ${candidate.criminalCases || 0} criminal cases, attendance ${candidate.attendance || 'N/A'}. `;
     setChatMessages(prev => [...prev, userMsg]);
     setChatInput('');
     setChatLoading(true);
@@ -127,6 +157,17 @@ export default function CandidateDetailPage() {
     }
   }, [candidate, chatLoading]);
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-warm-cream flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 border-4 border-election-amber/30 border-t-election-amber rounded-full animate-spin" />
+        <p className="text-[14px] text-text-secondary">Loading candidate profile…</p>
+      </div>
+    );
+  }
+
+  // Not found state
   if (!candidate) {
     return (
       <div className="min-h-screen bg-warm-cream flex flex-col items-center justify-center gap-4">
@@ -136,6 +177,9 @@ export default function CandidateDetailPage() {
       </div>
     );
   }
+
+  const partyColor = PARTY_COLORS[candidate.party] || PARTY_COLORS['IND'];
+  const attendancePct = candidate.attendance ? parseInt(candidate.attendance) : null;
 
   const TABS = [
     { key: 'overview', label: 'Overview' },
@@ -151,24 +195,45 @@ export default function CandidateDetailPage() {
           <span className="material-symbols-outlined text-[22px]">arrow_back</span>
         </button>
         <h1 className="font-bold text-[17px] text-primary-ink flex-1 truncate">{candidate.name}</h1>
-        <span className="text-[13px] font-semibold px-3 py-1 rounded-full" style={{ background: `${candidate.partyColor}18`, color: candidate.partyColor }}>
+        <span className="text-[13px] font-semibold px-3 py-1 rounded-full" style={{ background: `${partyColor}18`, color: partyColor }}>
           {candidate.party}
         </span>
       </header>
 
       {/* Hero */}
       <div className="bg-gradient-to-b from-pure-white to-warm-cream px-4 pt-5 pb-4 flex items-start gap-4">
-        <img src={candidate.avatar} alt={candidate.name} className="w-20 h-20 rounded-2xl object-cover border-2 border-surface-variant shadow-md" />
+        {/* Party-colored avatar */}
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-[28px] font-black border-2 shadow-md shrink-0"
+          style={{ background: `${partyColor}15`, color: partyColor, borderColor: `${partyColor}30` }}>
+          {candidate.name.charAt(0)}
+        </div>
         <div className="flex-1 min-w-0">
-          <h2 className="text-[22px] font-bold text-primary-ink leading-tight">{candidate.name}</h2>
-          <p className="text-[14px] text-text-secondary mt-0.5">{candidate.status} · {candidate.constituency}, {candidate.state}</p>
-          <p className="text-[13px] text-text-muted mt-1">{candidate.education} · Age {candidate.age}</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-[22px] font-bold text-primary-ink leading-tight">{candidate.name}</h2>
+            {candidate.isWinner && (
+              <span className="material-symbols-outlined text-success-green text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
+            )}
+          </div>
+          <p className="text-[14px] text-text-secondary mt-0.5">
+            {candidate.isWinner ? 'Winner' : 'Candidate'} · {candidate.constituency}, {candidate.state}
+          </p>
+          {candidate.education && <p className="text-[13px] text-text-muted mt-1">{candidate.education}{candidate.age ? ` · Age ${candidate.age}` : ''}</p>}
           <div className="flex flex-wrap gap-1.5 mt-2">
-            {candidate.sources.map(src => (
-              <span key={src} className={cn('text-[10px] font-bold px-2.5 py-0.5 rounded-full border', srcStyles[src] || 'bg-surface-variant text-on-surface')}>
-                {src}
-              </span>
-            ))}
+            {candidate.mynetaUrl && (
+              <a href={candidate.mynetaUrl} target="_blank" rel="noopener noreferrer"
+                className={cn('text-[10px] font-bold px-2.5 py-0.5 rounded-full border', srcStyles['myneta'])}>
+                MyNeta ↗
+              </a>
+            )}
+            {candidate.prsUrl && (
+              <a href={candidate.prsUrl} target="_blank" rel="noopener noreferrer"
+                className={cn('text-[10px] font-bold px-2.5 py-0.5 rounded-full border', srcStyles['prs'])}>
+                PRS ↗
+              </a>
+            )}
+            <span className={cn('text-[10px] font-bold px-2.5 py-0.5 rounded-full border', srcStyles['eci'])}>
+              ECI Affidavit
+            </span>
           </div>
         </div>
       </div>
@@ -202,19 +267,33 @@ export default function CandidateDetailPage() {
         >
           {tab === 'overview' && (
             <div className="px-4 pt-5 flex flex-col gap-4">
-              {/* Bio */}
+              {/* Profession/Bio */}
               <div className="bg-pure-white rounded-2xl p-4 border border-surface-variant shadow-sm">
                 <h3 className="text-[12px] font-bold text-text-muted uppercase tracking-wider mb-2">About</h3>
-                <p className="text-[14px] text-primary-ink leading-relaxed">{candidate.bio}</p>
+                <div className="flex flex-col gap-1.5">
+                  {candidate.selfProfession && (
+                    <p className="text-[14px] text-primary-ink leading-relaxed">
+                      <span className="text-text-muted font-medium">Profession: </span>{candidate.selfProfession}
+                    </p>
+                  )}
+                  {candidate.spouseProfession && (
+                    <p className="text-[14px] text-primary-ink leading-relaxed">
+                      <span className="text-text-muted font-medium">Spouse: </span>{candidate.spouseProfession}
+                    </p>
+                  )}
+                  {!candidate.selfProfession && !candidate.spouseProfession && (
+                    <p className="text-[14px] text-text-muted italic">No additional profile details available.</p>
+                  )}
+                </div>
               </div>
 
-              {/* Stats */}
+              {/* Financial Disclosure */}
               <div className="bg-pure-white rounded-2xl p-4 border border-surface-variant shadow-sm">
                 <h3 className="text-[12px] font-bold text-text-muted uppercase tracking-wider mb-3">Financial Disclosure</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Declared Assets', value: candidate.assets, icon: 'account_balance_wallet', color: '#1A6B3C' },
-                    { label: 'Liabilities', value: candidate.liabilities, icon: 'trending_down', color: '#ba1a1a' },
+                    { label: 'Declared Assets', value: candidate.totalAssets || 'N/A', icon: 'account_balance_wallet', color: '#1A6B3C' },
+                    { label: 'Liabilities', value: candidate.totalLiabilities || 'N/A', icon: 'trending_down', color: '#ba1a1a' },
                   ].map(s => (
                     <div key={s.label} className="bg-warm-cream rounded-xl p-3 flex flex-col gap-1">
                       <span className="material-symbols-outlined text-[18px]" style={{ color: s.color }}>{s.icon}</span>
@@ -229,22 +308,27 @@ export default function CandidateDetailPage() {
               <div className="bg-pure-white rounded-2xl p-4 border border-surface-variant shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-[12px] font-bold text-text-muted uppercase tracking-wider">Criminal Cases</h3>
-                  <span className={cn('text-[13px] font-bold px-2.5 py-1 rounded-full', candidate.casesCount > 0 ? 'bg-red-50 text-alert-red' : 'bg-green-50 text-success-green')}>
-                    {candidate.casesCount} pending
+                  <span className={cn('text-[13px] font-bold px-2.5 py-1 rounded-full',
+                    (candidate.criminalCases || 0) > 0 ? 'bg-red-50 text-alert-red' : 'bg-green-50 text-success-green'
+                  )}>
+                    {candidate.criminalCases || 0} pending
+                    {candidate.seriousCases ? ` (${candidate.seriousCases} serious)` : ''}
                   </span>
                 </div>
-                {candidate.cases.length === 0 ? (
+                {(candidate.criminalCases || 0) === 0 ? (
                   <p className="text-[14px] text-success-green flex items-center gap-2">
                     <span className="material-symbols-outlined text-[18px]">verified</span> Clean record — no pending cases
                   </p>
                 ) : (
-                  <ul className="flex flex-col gap-2">
-                    {candidate.cases.map((c, i) => (
-                      <li key={i} className="text-[13px] text-primary-ink bg-red-50 rounded-xl px-3 py-2 border border-red-100">
-                        {c}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="flex flex-col gap-2">
+                    {candidate.caseDetails ? (
+                      <p className="text-[13px] text-primary-ink bg-red-50 rounded-xl px-3 py-2 border border-red-100">
+                        {candidate.caseDetails}
+                      </p>
+                    ) : (
+                      <p className="text-[13px] text-alert-red italic">Case details are pending extraction from affidavit.</p>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -254,32 +338,35 @@ export default function CandidateDetailPage() {
             <div className="px-4 pt-5 flex flex-col gap-4">
               <div className="bg-pure-white rounded-2xl p-4 border border-surface-variant shadow-sm">
                 <h3 className="text-[12px] font-bold text-text-muted uppercase tracking-wider mb-3">Parliamentary Performance</h3>
-                {candidate.attendancePct === null ? (
-                  <p className="text-[14px] text-text-muted italic">No parliamentary record — first-time candidate.</p>
+                {attendancePct === null ? (
+                  <p className="text-[14px] text-text-muted italic">
+                    {candidate.isWinner ? 'Performance data is being collected from PRS Legislative Research.' : 'No parliamentary record — first-time candidate or no data available.'}
+                  </p>
                 ) : (
                   <div className="flex flex-col gap-4">
                     {/* Attendance bar */}
                     <div className="flex flex-col gap-1.5">
                       <div className="flex justify-between text-[13px]">
                         <span className="text-text-secondary font-medium">Attendance</span>
-                        <span className="font-bold text-primary-ink">{candidate.attendancePct}%</span>
+                        <span className="font-bold text-primary-ink">{candidate.attendance}</span>
                       </div>
                       <div className="w-full bg-surface-container h-2.5 rounded-full overflow-hidden">
                         <motion.div
                           className="h-full bg-success-green rounded-full"
                           initial={{ width: 0 }}
-                          animate={{ width: `${candidate.attendancePct}%` }}
+                          animate={{ width: `${attendancePct}%` }}
                           transition={{ duration: 0.8, ease: 'easeOut' }}
                         />
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       {[
-                        { label: 'Bills Introduced', value: candidate.billsIntroduced, icon: 'description' },
-                        { label: 'Questions Asked', value: candidate.questionsAsked, icon: 'help' },
+                        { label: 'Questions', value: candidate.questionsAsked || 0, icon: 'help' },
+                        { label: 'Debates', value: candidate.debatesParticipated || 0, icon: 'forum' },
+                        { label: 'Bills', value: candidate.privateBills || 0, icon: 'description' },
                       ].map(s => (
-                        <div key={s.label} className="bg-warm-cream rounded-xl p-3 flex flex-col gap-1">
+                        <div key={s.label} className="bg-warm-cream rounded-xl p-3 flex flex-col gap-1 items-center">
                           <span className="material-symbols-outlined text-election-amber text-[20px]">{s.icon}</span>
                           <span className="text-[22px] font-bold text-primary-ink">{s.value}</span>
                           <span className="text-[11px] text-text-muted">{s.label}</span>
@@ -294,7 +381,7 @@ export default function CandidateDetailPage() {
                 <div className="flex items-start gap-3">
                   <span className="material-symbols-outlined text-election-amber text-[20px] mt-0.5">info</span>
                   <p className="text-[13px] text-[#524534] leading-relaxed">
-                    Data sourced from PRS Legislative Research and ECI affidavits. All information is in the public domain as mandated by the Supreme Court (2003).
+                    Data sourced from PRS Legislative Research and ECI affidavits via MyNeta.info (ADR). All information is in the public domain as mandated by the Supreme Court of India (2003 judgment).
                   </p>
                 </div>
               </div>
@@ -325,7 +412,7 @@ export default function CandidateDetailPage() {
 
               {/* Quick questions */}
               <div className="px-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
-                {['How many cases?', 'What is their attendance?', 'Tell me about their assets'].map(q => (
+                {['How many cases?', 'What is their attendance?', 'Tell me about their assets', 'Compare with other candidates'].map(q => (
                   <button
                     key={q}
                     onClick={() => sendChat(q)}
