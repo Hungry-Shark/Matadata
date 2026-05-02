@@ -3,7 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/store/appStore';
+import { useTranslations } from 'next-intl';
 import { BottomNav } from '@/components/navigation/BottomNav';
+import { ProfileDrawer } from '@/components/navigation/ProfileDrawer';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import type { ChatMessage, Source } from '@/types';
 
@@ -20,12 +23,6 @@ async function saveSessionToFirestore(uid: string, sessionId: string, messages: 
   }
 }
 
-const SUGGESTIONS = [
-  'Compare candidates',
-  'View attendance record',
-  'Criminal cases',
-  'What is Model Code of Conduct?',
-];
 
 function SourceChip({ source }: { source: Source }) {
   // Use Tailwind classes from Stitch
@@ -103,13 +100,23 @@ function StreamingIndicator() {
 }
 
 export default function ChatPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionIdRef = useRef<string>(crypto.randomUUID());
-  const { user } = useAppStore();
+  const { user, language } = useAppStore();
+  const t = useTranslations('chat');
+
+  const suggestions = [
+    t('suggestion1'),
+    t('suggestion2'),
+    t('suggestion3'),
+    t('suggestion4'),
+  ];
 
   const showSuggestions = messages.length === 0;
 
@@ -140,13 +147,13 @@ export default function ChatPage() {
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: newMessages }),
+          body: JSON.stringify({ messages: newMessages, language }),
         });
 
         if (!res.ok) throw new Error(res.statusText);
 
         const sourcesHeader = res.headers.get('X-Sources');
-        let sources = [];
+        let sources: Source[] = [];
         if (sourcesHeader) {
           try {
             sources = JSON.parse(atob(sourcesHeader));
@@ -202,14 +209,14 @@ export default function ChatPage() {
           {
             id: crypto.randomUUID(),
             role: 'assistant',
-            content: 'Sorry, I encountered an error connecting to the server. Please try again.',
+            content: t('errorMsg'),
             timestamp: new Date().toISOString(),
           },
         ]);
         setIsLoading(false);
       }
     },
-    [messages, user]
+    [messages, user, t, language]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -224,22 +231,23 @@ export default function ChatPage() {
   return (
     <div className="bg-warm-cream text-primary-ink font-body-md antialiased min-h-screen flex flex-col">
       {/* TopAppBar */}
-      <header className="bg-[#FFFDF5] dark:bg-stone-950 font-['Epilogue'] font-bold tracking-tight text-stone-900 dark:text-stone-50 border-b border-stone-200 dark:border-stone-800 fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-16">
+      <header className="bg-[#FFFDF5] border-b border-stone-200 fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 h-16">
         <button
-          onClick={() => window.history.back()}
-          aria-label="Menu"
-          className="hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors scale-95 active:duration-150 p-2 rounded-full -ml-2"
+          onClick={() => router.back()}
+          aria-label="Back"
+          className="hover:bg-stone-100 transition-colors p-2 rounded-full -ml-1 active:scale-90"
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="text-2xl font-black italic tracking-tighter text-stone-900 dark:text-stone-50">
-          MataData
-        </h1>
+        <h1 className="text-[20px] font-black italic tracking-tighter text-stone-900">MataData</h1>
         <button
+          onClick={() => setProfileOpen(true)}
           aria-label="User profile"
-          className="hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors scale-95 active:duration-150 w-8 h-8 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center"
+          className="w-9 h-9 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center active:scale-90 transition-transform"
         >
-          <span className="material-symbols-outlined text-text-muted mt-1">person</span>
+          {user?.photoURL
+            ? <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+            : <span className="material-symbols-outlined text-[20px] text-text-muted mt-1">person</span>}
         </button>
       </header>
 
@@ -254,7 +262,7 @@ export default function ChatPage() {
               <span className="material-symbols-outlined text-pure-white text-[16px]">smart_toy</span>
             </div>
             <div className="bg-pure-white rounded-2xl rounded-tl-none p-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-surface-variant font-body-md text-primary-ink">
-              Namaskar! I am your civic assistant. How can I help you understand your electoral rights or candidates today?
+              {t('greeting')}
             </div>
           </div>
         )}
@@ -277,7 +285,7 @@ export default function ChatPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
             >
-              {SUGGESTIONS.map((suggestion) => (
+              {suggestions.map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => handleSuggestion(suggestion)}
@@ -303,10 +311,12 @@ export default function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-grow bg-transparent border-none focus:ring-0 font-body-md text-primary-ink placeholder:text-text-muted px-2 outline-none"
-            placeholder="Ask about candidates or rights..."
+            placeholder={t('placeholder')}
             type="text"
           />
-          <button type="button" aria-label="Voice input" className="p-2 text-text-secondary hover:text-election-amber transition-colors">
+          <button type="button" aria-label="Voice input"
+            onClick={() => router.push('/voice')}
+            className="p-2 text-text-secondary hover:text-election-amber transition-colors">
             <span className="material-symbols-outlined">mic</span>
           </button>
           {input.trim() && (
@@ -318,8 +328,7 @@ export default function ChatPage() {
       </div>
 
       <BottomNav />
+      <ProfileDrawer isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
     </div>
   );
 }
-
-
