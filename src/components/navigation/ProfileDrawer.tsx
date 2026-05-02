@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/appStore';
+import { useTranslations } from 'next-intl';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
+import { SUPPORTED_LOCALES, LOCALE_META } from '@/i18n/config';
+import type { Language } from '@/types';
 
 interface ProfileDrawerProps {
   isOpen: boolean;
@@ -14,13 +17,15 @@ interface ProfileDrawerProps {
 
 /**
  * Profile Drawer — slides up from bottom.
- * Shows user info, constituency, and logout.
+ * Shows user info, constituency, language selector, and logout.
  * Designed for mobile: full-screen bottom sheet.
  */
 export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
   const router = useRouter();
-  const { user, constituency, clearUser, resetOnboarding } = useAppStore();
+  const t = useTranslations('profile');
+  const { user, constituency, language, setLanguage, clearUser, resetOnboarding } = useAppStore();
   const [signingOut, setSigningOut] = useState(false);
+  const [showLangPicker, setShowLangPicker] = useState(false);
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -34,12 +39,19 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
     }
   };
 
+  const handleLanguageChange = (lang: Language) => {
+    setLanguage(lang);
+    setShowLangPicker(false);
+    // Reload to let next-intl server pick up the new locale cookie
+    window.location.reload();
+  };
+
   const menuItems = [
-    { icon: 'location_on', label: 'Change Constituency', action: () => { onClose(); router.push('/onboarding/location'); } },
-    { icon: 'notifications', label: 'Notifications', action: () => {} },
-    { icon: 'translate', label: 'Language', action: () => {} },
-    { icon: 'help', label: 'Help & FAQ', action: () => {} },
-    { icon: 'info', label: 'About MataData', action: () => {} },
+    { icon: 'location_on', label: t('changeConstituency'), action: () => { onClose(); router.push('/onboarding/location'); } },
+    { icon: 'notifications', label: t('notifications'), action: () => {} },
+    { icon: 'translate', label: `${t('language')} · ${LOCALE_META[language as keyof typeof LOCALE_META]?.nativeName || 'English'}`, action: () => setShowLangPicker(true) },
+    { icon: 'help', label: t('helpFaq'), action: () => {} },
+    { icon: 'info', label: t('about'), action: () => {} },
   ];
 
   return (
@@ -85,10 +97,10 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
                 </div>
                 <div className="flex flex-col min-w-0">
                   <h2 className="text-[18px] font-bold text-primary-ink truncate">
-                    {user?.name || 'Voter'}
+                    {user?.name || t('voter')}
                   </h2>
                   <p className="text-[13px] text-text-secondary truncate">
-                    {user?.email || 'Not signed in'}
+                    {user?.email || t('notSignedIn')}
                   </p>
                   {constituency && (
                     <div className="inline-flex items-center gap-1 mt-1.5 bg-amber-soft rounded-full px-2.5 py-1 w-max border border-election-amber/20">
@@ -104,7 +116,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
             <div className="px-4 py-3 overflow-y-auto" style={{ maxHeight: '50dvh' }}>
               {menuItems.map((item) => (
                 <button
-                  key={item.label}
+                  key={item.icon}
                   onClick={item.action}
                   className="w-full flex items-center gap-4 px-3 py-4 rounded-xl hover:bg-surface-container-low active:bg-surface-container transition-colors text-left"
                 >
@@ -117,6 +129,43 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
               ))}
             </div>
 
+            {/* Language Picker (inline) */}
+            <AnimatePresence>
+              {showLangPicker && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="px-4 overflow-hidden"
+                >
+                  <div className="bg-deep-cream rounded-2xl p-4 mb-3 border border-surface-variant">
+                    <p className="text-[12px] font-bold text-text-secondary uppercase tracking-wider mb-3">{t('language')}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {SUPPORTED_LOCALES.map(loc => {
+                        const meta = LOCALE_META[loc];
+                        const isActive = language === loc;
+                        return (
+                          <button
+                            key={loc}
+                            onClick={() => handleLanguageChange(loc)}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all ${
+                              isActive
+                                ? 'bg-election-amber text-pure-white shadow-md'
+                                : 'bg-pure-white text-primary-ink border border-surface-variant hover:border-election-amber/40'
+                            }`}
+                          >
+                            <span className="text-[14px] font-semibold">{meta.nativeName}</span>
+                            <span className={`text-[11px] ml-auto ${isActive ? 'text-pure-white/70' : 'text-text-muted'}`}>{loc.toUpperCase()}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Logout */}
             <div className="px-4 pb-6 pt-2 border-t border-surface-variant">
               <button
@@ -125,7 +174,7 @@ export function ProfileDrawer({ isOpen, onClose }: ProfileDrawerProps) {
                 className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-error-container text-on-error-container font-bold text-[15px] active:scale-[0.98] transition-transform disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[20px]">logout</span>
-                {signingOut ? 'Signing out…' : 'Sign Out'}
+                {signingOut ? t('signingOut') : t('signOut')}
               </button>
             </div>
           </motion.div>

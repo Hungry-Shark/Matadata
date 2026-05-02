@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { auth, googleProvider } from '@/lib/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useAppStore } from '@/store/appStore';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 
 export default function AuthPage() {
   const router = useRouter();
   const { setUser, completeOnboarding } = useAppStore();
+  const t = useTranslations('auth');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -90,7 +92,7 @@ export default function AuthPage() {
             MataData
           </h1>
           <p className="text-[16px] text-text-secondary leading-snug">
-            Your brilliant, trustworthy guide<br />to Indian elections.
+            {t('subtitle')}
           </p>
         </motion.div>
 
@@ -123,7 +125,7 @@ export default function AuthPage() {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
             )}
-            {loading ? 'Signing in…' : 'Continue with Google'}
+            {loading ? t('signingIn') : t('googleBtn')}
           </button>
 
           {/* Guest */}
@@ -131,7 +133,7 @@ export default function AuthPage() {
             onClick={handleGuest}
             className="w-full h-14 rounded-full bg-deep-cream text-primary-ink text-[16px] font-semibold flex items-center justify-center gap-2 active:scale-95 transition-transform group"
           >
-            Explore as Guest
+            {t('guestBtn')}
             <span className="material-symbols-outlined text-[18px] group-active:translate-x-1 transition-transform">
               arrow_forward
             </span>
@@ -140,10 +142,10 @@ export default function AuthPage() {
 
         {/* Fine print */}
         <p className="text-[11px] text-text-muted text-center mt-8 px-4 leading-relaxed">
-          By continuing, you agree to our{' '}
-          <a href="#" className="underline text-primary-ink/60">Terms of Service</a>
-          {' '}and{' '}
-          <a href="#" className="underline text-primary-ink/60">Privacy Policy</a>.
+          {t('terms')}{' '}
+          <a href="#" className="underline text-primary-ink/60">{t('termsLink')}</a>
+          {' '}{t('and')}{' '}
+          <a href="#" className="underline text-primary-ink/60">{t('privacyLink')}</a>.
         </p>
       </main>
     </div>
