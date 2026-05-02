@@ -1,0 +1,120 @@
+{
+  "nav": {
+    "home": "Home",
+    "chat": "Chat",
+    "candidates": "Candidates",
+    "rights": "Rights"
+  },
+  "home": {
+    "greeting": "Hey, {name}! 🗳️",
+    "upcoming": "UPCOMING",
+    "electionTitle": "General Elections 2026",
+    "daysLeft": "DAYS LEFT",
+    "askAi": "Ask AI",
+    "askAiSub": "Get instant answers",
+    "voiceAsk": "Voice Ask",
+    "voiceAskSub": "Speak your query",
+    "myRights": "My Rights",
+    "myRightsSub": "Know your power",
+    "findBooth": "Find Booth",
+    "findBoothSub": "Locate your center",
+    "didYouKnow": "Did You Know?"
+  },
+  "chat": {
+    "title": "Ask MataData",
+    "placeholder": "Ask about candidates, rights, elections…",
+    "greeting": "Namaskar! I am your civic assistant. How can I help you understand your electoral rights or candidates today?",
+    "suggestion1": "How do I check if my name is on the voter list?",
+    "suggestion2": "What documents do I need to vote?",
+    "suggestion3": "What is NOTA and how does it work?",
+    "suggestion4": "How do I find my polling booth?",
+    "thinking": "Thinking…",
+    "errorMsg": "Something went wrong. Please try again."
+  },
+  "voice": {
+    "idle": "Tap to speak",
+    "listening": "Listening",
+    "thinking": "Thinking",
+    "speaking": "Speaking",
+    "tapHint": "Tap the mic to ask anything about elections",
+    "end": "End Session",
+    "typeInstead": "Type Instead",
+    "askMore": "Want to ask more?",
+    "stillHere": "I'm still here, ready to help.",
+    "keepListening": "Yes, keep listening 🎤",
+    "imDone": "No, I'm done",
+    "initialResponse": "How can I help you find your local representatives?"
+  },
+  "rights": {
+    "title": "Voter Rights",
+    "subtitle": "Understand your constitutional rights and protections as an Indian voter.",
+    "searchPlaceholder": "Search rights, articles, or topics…",
+    "cat_all": "All",
+    "cat_fundamental": "Fundamental",
+    "cat_electoral": "Electoral",
+    "cat_protections": "Protections",
+    "cat_rti": "RTI",
+    "askAi": "Ask AI to explain this"
+  },
+  "booth": {
+    "title": "Find Your Booth",
+    "boothLocator": "Booth Locator",
+    "subtitle": "Enter your pincode or use GPS to locate your assigned polling station.",
+    "pincodeLabel": "Enter Pincode",
+    "searchBtn": "Search",
+    "gpsBtn": "GPS",
+    "openMaps": "Open in Maps",
+    "fromLocation": "{distance} from your location",
+    "boothData": "Booth data is sourced from the Election Commission of India."
+  },
+  "auth": {
+    "title": "MataData",
+    "subtitle": "Your brilliant, trustworthy guide to Indian elections.",
+    "googleBtn": "Continue with Google",
+    "signingIn": "Signing in…",
+    "guestBtn": "Explore as Guest",
+    "terms": "By continuing, you agree to our",
+    "termsLink": "Terms of Service",
+    "and": "and",
+    "privacyLink": "Privacy Policy"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "hookTitle": "Your Vote.\nYour Voice.\nYour Right.",
+    "hookSub": "India's smartest election guide",
+    "featuresTitle": "Know before you vote.",
+    "feat1": "Criminal cases",
+    "feat2": "PRS attendance",
+    "feat3": "Constitutional rights",
+    "feat4": "Booth locator",
+    "voiceTitle": "Ask anything.\nIn any language.",
+    "voiceSub": "Hindi, English — just speak up.",
+    "locationTitle": "Where are you voting?",
+    "locationSub": "We need your location to show the right candidates for your constituency.",
+    "pincodeLabel": "Enter Pincode",
+    "gpsButton": "Use my current location",
+    "langTitle": "Preferred Language",
+    "cta": "Continue",
+    "pincodeError": "Please enter a valid 6-digit pincode.",
+    "gpsError": "Could not access location. Enter your pincode.",
+    "or": "or"
+  },
+  "profile": {
+    "changeConstituency": "Change Constituency",
+    "notifications": "Notifications",
+    "language": "Language",
+    "helpFaq": "Help & FAQ",
+    "about": "About MataData",
+    "signOut": "Sign Out",
+    "signingOut": "Signing out…",
+    "notSignedIn": "Not signed in",
+    "voter": "Voter"
+  },
+  "facts": {
+    "fact1": "You can still vote if your name is on the electoral roll but you don't have a Voter ID card. You can use alternative documents like an Aadhaar card or PAN card.",
+    "fact2": "NOTA (None of the Above) option was introduced in Indian elections after the Supreme Court ruling in 2013. It allows voters to reject all candidates.",
+    "fact3": "A candidate's criminal record, assets, and educational qualifications are public information, mandated by the Supreme Court of India.",
+    "fact4": "No voter can be turned away from a polling booth after the queue closes. If you are in line before the official closing time, you have the right to vote.",
+    "fact5": "The Model Code of Conduct restricts political parties from using government machinery for campaigning once elections are announced."
+  }
+}
